@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart City Analytics Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1>🏙️ Smart City Analytics Dashboard</h1>
+        <p class="tagline">Real-time urban data from multiple APIs</p>
+      </div>
+      <div class="search-section">
+        <input type="text" id="cityInput" placeholder="Enter city name (e.g., London, New York, Delhi)" value="London">
+        <button id="searchBtn" class="btn-primary">
+          <span id="btnText">Search City</span>
+          <span id="btnLoader" class="loader" style="display: none;">⏳</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- City Info -->
+    <div id="cityInfo" class="city-info" style="display: none;">
+      <h2 id="cityName">—</h2>
+      <p id="cityCoords">—</p>
+      <p id="lastUpdate">Last updated: Never</p>
+    </div>
+
+    <!-- Metrics Grid -->
+    <section class="metrics">
+      <div class="metric-card air-quality">
+        <div class="metric-icon">🌬️</div>
+        <div class="metric-info">
+          <h3>Air Quality Index</h3>
+          <div class="metric-value" id="aqiValue">—</div>
+          <div class="metric-status" id="aqiStatus">Loading...</div>
+        </div>
+      </div>
+
+      <div class="metric-card weather">
+        <div class="metric-icon">🌡️</div>
+        <div class="metric-info">
+          <h3>Temperature</h3>
+          <div class="metric-value" id="tempValue">—</div>
+          <div class="metric-status" id="tempStatus">Loading...</div>
+        </div>
+      </div>
+
+      <div class="metric-card traffic">
+        <div class="metric-icon">🚗</div>
+        <div class="metric-info">
+          <h3>Traffic Flow</h3>
+          <div class="metric-value" id="trafficValue">—</div>
+          <div class="metric-status" id="trafficStatus">Loading...</div>
+        </div>
+      </div>
+
+      <div class="metric-card energy">
+        <div class="metric-icon">⚡</div>
+        <div class="metric-info">
+          <h3>Energy Usage</h3>
+          <div class="metric-value" id="energyValue">—</div>
+          <div class="metric-status" id="energyStatus">Loading...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Grid -->
+    <section class="charts-grid">
+      <div class="chart-card">
+        <h3>🌬️ Air Quality Index (US AQI 0-500)</h3>
+        <canvas id="airQualityChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>🌡️ Temperature Forecast (7 days)</h3>
+        <canvas id="weatherChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>🚗 Traffic Patterns (24h)</h3>
+        <canvas id="trafficChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>⚡ Energy Consumption (24h)</h3>
+        <canvas id="energyChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Data Sources Info -->
+    <section class="data-sources">
+      <h3>📡 Data Sources</h3>
+      <div class="sources-grid">
+        <div class="source-item">
+          <strong>Air Quality:</strong> OpenWeatherMap Air Pollution API
+        </div>
+        <div class="source-item">
+          <strong>Weather:</strong> OpenWeatherMap Weather API
+        </div>
+        <div class="source-item">
+          <strong>Traffic:</strong> TomTom Traffic API
+        </div>
+        <div class="source-item">
+          <strong>Energy:</strong> Carbon Intensity API (UK)
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Built with HTML, CSS, JavaScript & Chart.js | Real-time data from public APIs</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

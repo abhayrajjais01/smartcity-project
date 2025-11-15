@@ -272,9 +272,58 @@ function generateEnergyData(weatherData, hours = 24) {
   return energy;
 }
 
+// Calculate US AQI from PM2.5 or PM10 using EPA formula
+function calculateUSAQI(pm, type) {
+  // PM2.5 breakpoints (µg/m³)
+  const pm25Breakpoints = [
+    { low: 0, high: 12.0, aqiLow: 0, aqiHigh: 50 },
+    { low: 12.1, high: 35.4, aqiLow: 51, aqiHigh: 100 },
+    { low: 35.5, high: 55.4, aqiLow: 101, aqiHigh: 150 },
+    { low: 55.5, high: 150.4, aqiLow: 151, aqiHigh: 200 },
+    { low: 150.5, high: 250.4, aqiLow: 201, aqiHigh: 300 },
+    { low: 250.5, high: 500.4, aqiLow: 301, aqiHigh: 500 }
+  ];
+  
+  // PM10 breakpoints (µg/m³)
+  const pm10Breakpoints = [
+    { low: 0, high: 54, aqiLow: 0, aqiHigh: 50 },
+    { low: 55, high: 154, aqiLow: 51, aqiHigh: 100 },
+    { low: 155, high: 254, aqiLow: 101, aqiHigh: 150 },
+    { low: 255, high: 354, aqiLow: 151, aqiHigh: 200 },
+    { low: 355, high: 424, aqiLow: 201, aqiHigh: 300 },
+    { low: 425, high: 604, aqiLow: 301, aqiHigh: 500 }
+  ];
+  
+  const breakpoints = type === 'pm25' ? pm25Breakpoints : pm10Breakpoints;
+  
+  // Find the appropriate breakpoint
+  for (const bp of breakpoints) {
+    if (pm >= bp.low && pm <= bp.high) {
+      // Calculate AQI using linear interpolation formula
+      const aqi = Math.round(((bp.aqiHigh - bp.aqiLow) / (bp.high - bp.low)) * (pm - bp.low) + bp.aqiLow);
+      return aqi;
+    }
+  }
+  
+  // If value exceeds highest breakpoint, return 500
+  return 500;
+}
+
 // Calculate AQI from OpenWeatherMap AQI (1-5) or PM2.5/PM10 values
 function calculateAQI(aqiValue, pm25, pm10) {
-  // If OpenWeatherMap AQI is provided (1-5 scale), use it
+  // If a US AQI value (0-500) is provided directly, use it
+  if (aqiValue !== null && aqiValue !== undefined && aqiValue >= 0 && aqiValue <= 500 && aqiValue > 5) {
+    let label, color;
+    if (aqiValue <= 50) { label = 'Good'; color = '#10b981'; }
+    else if (aqiValue <= 100) { label = 'Moderate'; color = '#84cc16'; }
+    else if (aqiValue <= 150) { label = 'Unhealthy for Sensitive'; color = '#f59e0b'; }
+    else if (aqiValue <= 200) { label = 'Unhealthy'; color = '#f97316'; }
+    else if (aqiValue <= 300) { label = 'Very Unhealthy'; color = '#ef4444'; }
+    else { label = 'Hazardous'; color = '#991b1b'; }
+    return { value: Math.round(aqiValue), label, color, rawAqi: aqiValue };
+  }
+  
+  // If OpenWeatherMap AQI is provided (1-5 scale), convert to US AQI
   if (aqiValue && aqiValue >= 1 && aqiValue <= 5) {
     const aqiLabels = {
       1: { label: 'Good', color: '#10b981', usaqi: 50 },
@@ -287,18 +336,29 @@ function calculateAQI(aqiValue, pm25, pm10) {
     return { value: aqi.usaqi, label: aqi.label, color: aqi.color, rawAqi: aqiValue };
   }
   
-  // Fallback: Calculate from PM2.5/PM10 values
+  // Calculate from PM2.5/PM10 values using proper EPA formula
   if (!pm25 && !pm10) return { value: 0, label: 'No Data', color: '#94a3b8' };
   
-  // Use PM2.5 as primary indicator
-  const pm = pm25 || (pm10 / 2);
+  // Calculate AQI from PM2.5 (preferred) or PM10
+  let usaqi;
+  if (pm25 && pm25 > 0) {
+    usaqi = calculateUSAQI(pm25, 'pm25');
+  } else if (pm10 && pm10 > 0) {
+    usaqi = calculateUSAQI(pm10, 'pm10');
+  } else {
+    return { value: 0, label: 'No Data', color: '#94a3b8' };
+  }
   
-  if (pm <= 50) return { value: Math.round(pm), label: 'Good', color: '#10b981' };
-  if (pm <= 100) return { value: Math.round(pm), label: 'Moderate', color: '#f59e0b' };
-  if (pm <= 150) return { value: Math.round(pm), label: 'Unhealthy for Sensitive', color: '#f97316' };
-  if (pm <= 200) return { value: Math.round(pm), label: 'Unhealthy', color: '#ef4444' };
-  if (pm <= 300) return { value: Math.round(pm), label: 'Very Unhealthy', color: '#dc2626' };
-  return { value: Math.round(pm), label: 'Hazardous', color: '#991b1b' };
+  // Determine label and color based on US AQI
+  let label, color;
+  if (usaqi <= 50) { label = 'Good'; color = '#10b981'; }
+  else if (usaqi <= 100) { label = 'Moderate'; color = '#84cc16'; }
+  else if (usaqi <= 150) { label = 'Unhealthy for Sensitive'; color = '#f59e0b'; }
+  else if (usaqi <= 200) { label = 'Unhealthy'; color = '#f97316'; }
+  else if (usaqi <= 300) { label = 'Very Unhealthy'; color = '#ef4444'; }
+  else { label = 'Hazardous'; color = '#991b1b'; }
+  
+  return { value: usaqi, label, color, rawAqi: null };
 }
 
 // Format time labels
@@ -544,14 +604,7 @@ async function loadAllForCity(cityName) {
       currentPM25 = (data.PM2_5 && data.PM2_5.concentration) || null;
       currentPM10 = (data.PM10 && data.PM10.concentration) || null;
       
-      // Convert US AQI to 1-5 scale if needed
-      if (currentAQI && currentAQI > 5 && currentAQI <= 500) {
-        if (currentAQI <= 50) currentAQI = 1;
-        else if (currentAQI <= 100) currentAQI = 2;
-        else if (currentAQI <= 150) currentAQI = 3;
-        else if (currentAQI <= 200) currentAQI = 4;
-        else currentAQI = 5;
-      }
+      // Keep US AQI as-is (0-500), calculateAQI will handle it properly
       
       // Use current data point for chart
       if (currentPM25 !== null || currentPM10 !== null) {
@@ -570,14 +623,7 @@ async function loadAllForCity(cityName) {
       currentPM25 = (data.iaqi && data.iaqi.pm25 && data.iaqi.pm25.v) || null;
       currentPM10 = (data.iaqi && data.iaqi.pm10 && data.iaqi.pm10.v) || null;
       
-      // Convert US AQI to 1-5 scale if needed
-      if (currentAQI && currentAQI > 5 && currentAQI <= 500) {
-        if (currentAQI <= 50) currentAQI = 1;
-        else if (currentAQI <= 100) currentAQI = 2;
-        else if (currentAQI <= 150) currentAQI = 3;
-        else if (currentAQI <= 200) currentAQI = 4;
-        else currentAQI = 5;
-      }
+      // Keep US AQI as-is (0-500), calculateAQI will handle it properly
       
       // Use current data point for chart
       if (currentPM25 !== null || currentPM10 !== null) {
@@ -617,14 +663,7 @@ async function loadAllForCity(cityName) {
           currentPM10 = pm10 || null;
           currentAQI = aqi || null;
           
-          // Convert US AQI to 1-5 scale if needed
-          if (currentAQI && currentAQI > 5 && currentAQI <= 500) {
-            if (currentAQI <= 50) currentAQI = 1;
-            else if (currentAQI <= 100) currentAQI = 2;
-            else if (currentAQI <= 150) currentAQI = 3;
-            else if (currentAQI <= 200) currentAQI = 4;
-            else currentAQI = 5;
-          }
+          // Keep US AQI as-is (0-500), calculateAQI will handle it properly
         }
       });
       
@@ -639,14 +678,8 @@ async function loadAllForCity(cityName) {
       currentPM10 = current.pm10 || null;
       currentAQI = current.us_aqi || current.european_aqi || null;
       
-      // Convert US AQI (0-500) to 1-5 scale if needed
-      if (currentAQI && currentAQI > 5) {
-        if (currentAQI <= 50) currentAQI = 1;
-        else if (currentAQI <= 100) currentAQI = 2;
-        else if (currentAQI <= 150) currentAQI = 3;
-        else if (currentAQI <= 200) currentAQI = 4;
-        else currentAQI = 5;
-      }
+      // Keep US AQI as-is (0-500), calculateAQI will handle it properly
+      // Note: European AQI uses different scale, but we'll treat it as US AQI for display
       
       // Use hourly data for chart if available
       if (hourly.time && hourly.pm2_5 && hourly.pm10) {
@@ -694,15 +727,7 @@ async function loadAllForCity(cityName) {
       currentPM25 = data.pm25 || data.pm2_5 || data.PM25 || data.PM2_5 || data.pm25_concentration || null;
       currentPM10 = data.pm10 || data.PM10 || data.pm10_concentration || null;
       
-      // If AQI is a number but not in 1-5 range, it might be US AQI (0-500), convert if needed
-      if (currentAQI && currentAQI > 5 && currentAQI <= 500) {
-        // Convert US AQI to 1-5 scale
-        if (currentAQI <= 50) currentAQI = 1;
-        else if (currentAQI <= 100) currentAQI = 2;
-        else if (currentAQI <= 150) currentAQI = 3;
-        else if (currentAQI <= 200) currentAQI = 4;
-        else currentAQI = 5;
-      }
+      // Keep US AQI as-is (0-500), calculateAQI will handle it properly
       
       // Use forecast data for chart if available
       if (airPollutionForecastResp && (airPollutionForecastResp.forecast || airPollutionForecastResp.data || airPollutionForecastResp.list)) {

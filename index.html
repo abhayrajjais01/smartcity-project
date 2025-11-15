@@ -18,10 +18,14 @@
       </div>
       <div class="search-section">
         <input type="text" id="cityInput" placeholder="Enter city name (e.g., London, New York, Delhi)" value="London">
-        <button id="searchBtn" class="btn-primary">
+        <button id="loadBtn" class="btn-primary">
           <span id="btnText">Search City</span>
-          <span id="btnLoader" class="loader" style="display: none;">⏳</span>
+          <span id="loader" class="loader" style="display: none;">⏳</span>
         </button>
+        <label style="display: flex; align-items: center; gap: 10px; color: var(--text-secondary); cursor: pointer;">
+          <input type="checkbox" id="autoRefresh" style="width: 20px; height: 20px; cursor: pointer;">
+          <span>Auto-refresh (60s)</span>
+        </label>
       </div>
     </header>
 
@@ -39,7 +43,7 @@
         <div class="metric-info">
           <h3>Air Quality Index</h3>
           <div class="metric-value" id="aqiValue">—</div>
-          <div class="metric-status" id="aqiStatus">Loading...</div>
+          <div class="metric-status" id="aqiLabel">Loading...</div>
         </div>
       </div>
 
@@ -48,7 +52,7 @@
         <div class="metric-info">
           <h3>Temperature</h3>
           <div class="metric-value" id="tempValue">—</div>
-          <div class="metric-status" id="tempStatus">Loading...</div>
+          <div class="metric-status" id="tempLabel">Loading...</div>
         </div>
       </div>
 
@@ -57,7 +61,7 @@
         <div class="metric-info">
           <h3>Traffic Flow</h3>
           <div class="metric-value" id="trafficValue">—</div>
-          <div class="metric-status" id="trafficStatus">Loading...</div>
+          <div class="metric-status" id="trafficLabel">Loading...</div>
         </div>
       </div>
 
@@ -66,7 +70,7 @@
         <div class="metric-info">
           <h3>Energy Usage</h3>
           <div class="metric-value" id="energyValue">—</div>
-          <div class="metric-status" id="energyStatus">Loading...</div>
+          <div class="metric-status" id="energyLabel">Loading...</div>
         </div>
       </div>
     </section>
@@ -75,7 +79,7 @@
     <section class="charts-grid">
       <div class="chart-card">
         <h3>🌬️ Air Quality Index (US AQI 0-500)</h3>
-        <canvas id="airQualityChart"></canvas>
+        <canvas id="aqChart"></canvas>
       </div>
 
       <div class="chart-card">
@@ -92,6 +96,12 @@
         <h3>⚡ Energy Consumption (24h)</h3>
         <canvas id="energyChart"></canvas>
       </div>
+    </section>
+
+    <!-- Comprehensive Insights -->
+    <section class="insights-section">
+      <h3>📊 Comprehensive Insights</h3>
+      <div id="insightsGrid" class="insights-grid"></div>
     </section>
 
     <!-- Data Sources Info -->

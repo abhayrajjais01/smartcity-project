@@ -1,0 +1,370 @@
+{
+  "info": {
+    "name": "Smart City Dashboard - APIs",
+    "description": "Collection of APIs used in the Smart City Dashboard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API Ninjas - Air Quality by City",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Api-Key",
+            "value": "",
+            "description": "Optional API key (leave empty for limited free use)"
+          }
+        ],
+        "url": {
+          "raw": "https://api.api-ninjas.com/v1/airquality?city=New York",
+          "protocol": "https",
+          "host": [
+            "api",
+            "api-ninjas",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "airquality"
+          ],
+          "query": [
+            {
+              "key": "city",
+              "value": "New York",
+              "description": "City name (e.g., New York, Los Angeles, Delhi, London)"
+            }
+          ]
+        },
+        "description": "Fetches live AQI data for any city. Supports city names directly. Works for cities across different states and countries. Returns overall_aqi, PM2.5, PM10, CO, NO₂, O₃, SO₂. No API key required for limited use."
+      }
+    },
+    {
+      "name": "AQICN - Air Quality by City",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.waqi.info/feed/New York/?token=demo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "waqi",
+            "info"
+          ],
+          "path": [
+            "feed",
+            "New York"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "demo",
+              "description": "Demo token (or use your own token from aqicn.org)"
+            }
+          ]
+        },
+        "description": "Fetches live AQI data from World Air Quality Index. Supports city names or coordinates. Works for 1000+ cities globally. Returns real-time AQI, PM2.5, PM10, and other pollutants."
+      }
+    },
+    {
+      "name": "AQICN - Air Quality by Coordinates",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.waqi.info/feed/geo:40.7128;-74.0060/?token=demo",
+          "protocol": "https",
+          "host": [
+            "api",
+            "waqi",
+            "info"
+          ],
+          "path": [
+            "feed",
+            "geo:40.7128;-74.0060"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "demo",
+              "description": "Demo token"
+            }
+          ]
+        },
+        "description": "Fetches live AQI data using geographic coordinates (latitude;longitude). Format: geo:lat;lon"
+      }
+    },
+    {
+      "name": "Open-Meteo - Air Quality (Current & Hourly)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=28.6139&longitude=77.209&hourly=pm10,pm2_5,european_aqi,us_aqi&current=european_aqi,us_aqi,pm10,pm2_5&timezone=auto",
+          "protocol": "https",
+          "host": [
+            "air-quality-api",
+            "open-meteo",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "air-quality"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "28.6139",
+              "description": "Latitude"
+            },
+            {
+              "key": "longitude",
+              "value": "77.209",
+              "description": "Longitude"
+            },
+            {
+              "key": "hourly",
+              "value": "pm10,pm2_5,european_aqi,us_aqi",
+              "description": "Hourly parameters"
+            },
+            {
+              "key": "current",
+              "value": "european_aqi,us_aqi,pm10,pm2_5",
+              "description": "Current parameters"
+            },
+            {
+              "key": "timezone",
+              "value": "auto",
+              "description": "Timezone"
+            }
+          ]
+        },
+        "description": "Fetches current and hourly air quality data from Open-Meteo Air Quality API. Provides US AQI, European AQI, PM2.5, PM10. No API key required."
+      }
+    },
+    {
+      "name": "Open-Meteo - Air Quality Forecast",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=28.6139&longitude=77.209&hourly=pm10,pm2_5,european_aqi,us_aqi&forecast_days=5&timezone=auto",
+          "protocol": "https",
+          "host": [
+            "air-quality-api",
+            "open-meteo",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "air-quality"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "28.6139",
+              "description": "Latitude"
+            },
+            {
+              "key": "longitude",
+              "value": "77.209",
+              "description": "Longitude"
+            },
+            {
+              "key": "hourly",
+              "value": "pm10,pm2_5,european_aqi,us_aqi",
+              "description": "Hourly parameters"
+            },
+            {
+              "key": "forecast_days",
+              "value": "5",
+              "description": "Number of forecast days"
+            },
+            {
+              "key": "timezone",
+              "value": "auto",
+              "description": "Timezone"
+            }
+          ]
+        },
+        "description": "Fetches 5-day air quality forecast with hourly data from Open-Meteo. Provides AQI and pollutant concentrations. No API key required."
+      }
+    },
+    {
+      "name": "OpenAQ - Air Quality Measurements (Fallback)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.openaq.org/v2/measurements?coordinates=28.6139,77.209&limit=50&sort=desc&radius=10000",
+          "protocol": "https",
+          "host": [
+            "api",
+            "openaq",
+            "org"
+          ],
+          "path": [
+            "v2",
+            "measurements"
+          ],
+          "query": [
+            {
+              "key": "coordinates",
+              "value": "28.6139,77.209",
+              "description": "Latitude,Longitude (e.g., Delhi coordinates)"
+            },
+            {
+              "key": "limit",
+              "value": "50",
+              "description": "Number of results to return"
+            },
+            {
+              "key": "sort",
+              "value": "desc",
+              "description": "Sort order"
+            },
+            {
+              "key": "radius",
+              "value": "10000",
+              "description": "Search radius in meters"
+            }
+          ]
+        },
+        "description": "Fallback: Fetches air quality measurements (PM2.5, PM10) from OpenAQ API. Used if OpenWeatherMap Air Pollution API fails. No API key required."
+      }
+    },
+    {
+      "name": "OpenWeatherMap - Weather Forecast",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.openweathermap.org/data/2.5/forecast?lat=28.6139&lon=77.209&appid=3c8ffd7f7339a065c6ce070bc0601a93&units=metric&cnt=24",
+          "protocol": "https",
+          "host": [
+            "api",
+            "openweathermap",
+            "org"
+          ],
+          "path": [
+            "data",
+            "2.5",
+            "forecast"
+          ],
+          "query": [
+            {
+              "key": "lat",
+              "value": "28.6139",
+              "description": "Latitude"
+            },
+            {
+              "key": "lon",
+              "value": "77.209",
+              "description": "Longitude"
+            },
+            {
+              "key": "appid",
+              "value": "3c8ffd7f7339a065c6ce070bc0601a93",
+              "description": "API Key"
+            },
+            {
+              "key": "units",
+              "value": "metric",
+              "description": "Temperature units (metric/imperial)"
+            },
+            {
+              "key": "cnt",
+              "value": "24",
+              "description": "Number of forecast entries"
+            }
+          ]
+        },
+        "description": "Fetches 24-hour weather forecast from OpenWeatherMap API. Requires API key."
+      }
+    },
+    {
+      "name": "Open-Meteo - Weather Forecast (Fallback)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://api.open-meteo.com/v1/forecast?latitude=28.6139&longitude=77.209&current_weather=true&hourly=temperature_2m,relativehumidity_2m&timezone=auto",
+          "protocol": "https",
+          "host": [
+            "api",
+            "open-meteo",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "forecast"
+          ],
+          "query": [
+            {
+              "key": "latitude",
+              "value": "28.6139"
+            },
+            {
+              "key": "longitude",
+              "value": "77.209"
+            },
+            {
+              "key": "current_weather",
+              "value": "true"
+            },
+            {
+              "key": "hourly",
+              "value": "temperature_2m,relativehumidity_2m"
+            },
+            {
+              "key": "timezone",
+              "value": "auto"
+            }
+          ]
+        },
+        "description": "Fallback weather API (Open-Meteo) - No API key required. Used if OpenWeatherMap fails."
+      }
+    },
+    {
+      "name": "Nominatim - Geocoding (City to Coordinates)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "User-Agent",
+            "value": "SmartCityDashboard/1.0"
+          }
+        ],
+        "url": {
+          "raw": "https://nominatim.openstreetmap.org/search?format=json&q=Delhi&limit=1",
+          "protocol": "https",
+          "host": [
+            "nominatim",
+            "openstreetmap",
+            "org"
+          ],
+          "path": [
+            "search"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "json"
+            },
+            {
+              "key": "q",
+              "value": "Delhi",
+              "description": "City name to geocode"
+            },
+            {
+              "key": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Converts city name to latitude/longitude coordinates. No API key required. Requires User-Agent header."
+      }
+    }
+  ]
+}
